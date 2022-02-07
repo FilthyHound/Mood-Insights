@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.nuigalway.bct.mood_insights">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -9,6 +11,24 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MoodInsights">
+        <activity
+            android:name=".GraphPage"
+            android:exported="false" />
+        <activity
+            android:name=".CalendarPage"
+            android:exported="false" />
+        <activity
+            android:name=".user.LoadUser"
+            android:exported="false" />
+        <activity
+            android:name=".ForgotPassword"
+            android:exported="false" />
+        <activity
+            android:name=".FactorPage"
+            android:exported="false" />
+        <activity
+            android:name=".RegisterUser"
+            android:exported="false" />
         <activity
             android:name=".MainActivity"
             android:exported="true">

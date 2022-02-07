@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "642237650686",
+    "firebase_url": "https://mood-insights-9119b-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "mood-insights-9119b",
+    "storage_bucket": "mood-insights-9119b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:642237650686:android:637584fc73066f8089b7af",
+        "android_client_info": {
+          "package_name": "com.nuigalway.bct.mood_insights"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "642237650686-rkio4lfavnvm4bm5aqjmrtla08hol5bf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCBZZarE_pFwXYxe-JHf42HMs2d20LiE1g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "642237650686-rkio4lfavnvm4bm5aqjmrtla08hol5bf.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

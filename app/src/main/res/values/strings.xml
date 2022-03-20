@@ -1,3 +1,42 @@
 <resources>
     <string name="app_name">Mood-Insights</string>
+    <string name="mood_insight_blurb">Track your moods</string>
+    <string name="email_verification_message">Please check your email address to verify your account before proceeding!</string>
+    <string name="button_continue">Continue</string>
+    <string name="user_full_name">Full Name</string>
+    <string name="user_age">Age</string>
+    <string name="user_email_address">Email Address</string>
+    <string name="user_password">Password</string>
+    <string name="button_register">Register</string>
+    <string name="button_login">Login</string>
+    <string name="login_forgot_password">Forgot Password?</string>
+    <string name="login_register">Register</string>
+    <string name="forgot_password_enter_your_email">Enter your Email</string>
+    <string name="button_reset_password">Reset Password</string>
+
+
+
+    <!-- Sleep Values -->
+    <string name="sleep_bed_early">early bedtime</string>
+    <string name="sleep_bed_late">late bedtime</string>
+    <string name="sleep_woke_early">woke early</string>
+    <string name="sleep_woke_refreshed">woke refreshed</string>
+    <string name="sleep_woke_tired">woke still tired</string>
+    <string name="sleep_could_not_begin">could not fall asleep</string>
+    <string name="sleep_could_not_stay">could not stay asleep</string>
+    <string name="sleep_nightmare">nightmare</string>
+    <string name="sleep_overslept">overslept</string>
+
+
+    <string-array name="sleep_factors">
+        <item>@string/sleep_bed_early</item>
+        <item>@string/sleep_bed_late</item>
+        <item>@string/sleep_woke_early</item>
+        <item>@string/sleep_woke_refreshed</item>
+        <item>@string/sleep_woke_tired</item>
+        <item>@string/sleep_could_not_begin</item>
+        <item>@string/sleep_could_not_stay</item>
+        <item>@string/sleep_nightmare</item>
+        <item>@string/sleep_overslept</item>
+    </string-array>
 </resources>

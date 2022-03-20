@@ -1,6 +1,5 @@
 package com.nuigalway.bct.mood_insights.validation;
 
-import android.util.Patterns;
 import android.widget.EditText;
 
 import org.apache.commons.lang3.StringUtils;
@@ -17,7 +16,7 @@ public class Validator {
     private static final String REGEX_PASSWORD = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#&()–{}:;',?/*~$^+=<>]).{8,}$";
     private static final Pattern PASSWORD_PATTERN = Pattern.compile(REGEX_PASSWORD);
 
-    public boolean emailValidation(String email, EditText emailEditText){
+    public boolean isEmailValid(String email, EditText emailEditText){
         if(!EmailValidator.getInstance().isValid(email)){
             emailEditText.setError("Please provide a valid email address!");
             emailEditText.requestFocus();
@@ -26,21 +25,18 @@ public class Validator {
         return true;
     }
 
-    public boolean passwordValidation(String password, EditText passwordEditText){
+    public boolean isPasswordValid(String password, EditText passwordEditText){
         if(password.isEmpty()){
             passwordEditText.setError("Password is required!");
             passwordEditText.requestFocus();
             return false;
-        }
-
-//        if(PASSWORD_PATTERN.m)
-
-        if(password.length() < MINIMUM_PASSWORD_LENGTH){
+        }else if(password.length() < MINIMUM_PASSWORD_LENGTH){
             passwordEditText.setError("Password length must be greater or equal to" + MINIMUM_PASSWORD_LENGTH + " characters!");
             passwordEditText.requestFocus();
             return false;
+        }else{
+            return true;
         }
-        return true;
 
         //TODO on release, enforce maximum chars of 100, at least one capital letter, one number and one special char
     }
@@ -56,6 +52,15 @@ public class Validator {
 
     public boolean ageStringValidation(String s, EditText eT){
         if(!StringUtils.isNumeric(s) || Integer.parseInt(s) > MAXIMUM_AGE){
+            eT.setError(ERROR_NUMBER);
+            eT.requestFocus();
+            return false;
+        }
+        return true;
+    }
+
+    public boolean numberOneToTen(Integer s, EditText eT){
+        if(s < 1 || s > 10){
             eT.setError(ERROR_NUMBER);
             eT.requestFocus();
             return false;

@@ -3,18 +3,25 @@ package com.nuigalway.bct.mood_insights;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.TimePickerDialog;
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.view.MenuItem;
+import android.text.InputType;
+import android.text.format.DateFormat;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.navigation.NavigationBarView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -23,28 +30,51 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.nuigalway.bct.mood_insights.data.Day;
+import com.nuigalway.bct.mood_insights.data.Factor;
+import com.nuigalway.bct.mood_insights.data.Sleep;
 import com.nuigalway.bct.mood_insights.user.User;
+import com.nuigalway.bct.mood_insights.util.FactorRecyclerAdaptor;
 import com.nuigalway.bct.mood_insights.util.Utils;
+import com.nuigalway.bct.mood_insights.validation.Validator;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Objects;
 
 @RequiresApi(api = Build.VERSION_CODES.O)
 public class FactorPage extends AppCompatActivity {
-    private boolean updateUser = false;
+    private boolean loadFactors = true;
     private FirebaseUser user;
     private DatabaseReference reference;
 
-    private String userID;
     private User userProfile;
 
-    private Button logOut;
+    private ProgressBar progressBar;
+
+    // Sleep Factor Variables
+    private Validator validator;
+    private final ArrayList<Factor> factorsList = new ArrayList<>();
+    private final ArrayList<TextView> factorViewListEnabled = new ArrayList<>();
+    private final ArrayList<TextView> factorViewListDisabled = new ArrayList<>();
+    private RecyclerView recyclerView;
+    private FactorRecyclerAdaptor.FactoryRecyclerViewClickListener listener;
+    private EditText sleepRating;
+    private EditText sleepAmount;
+    private EditText sleepStart;
+    private EditText sleepEnd;
+    private TimePickerDialog sleepAmountDialog, sleepStartDialog, sleepEndDialog;
+    private int amountHour = -1, amountMin = -1, startHour = -1, startMin = -1, endHour = -1, endMin = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_factor_page);
 
-        updateUser = false;
+        validator = new Validator();
+        loadFactors = true;
 
         initBottomNav();
         loadUserDetails();
@@ -54,28 +84,31 @@ public class FactorPage extends AppCompatActivity {
         BottomNavigationView bottomNavigationView = findViewById(R.id.navView);
         bottomNavigationView.setSelectedItemId(R.id.factorHome);
         bottomNavigationView.setOnItemSelectedListener(item -> {
-            switch (item.getItemId()){
-                case R.id.calendar:
-                    startActivity(new Intent(getApplicationContext(), CalendarPage.class));
-                    overridePendingTransition(0, 0);
-                    return true;
-                case R.id.factorHome:
-                    return true;
-                case R.id.graph:
-                    startActivity(new Intent(getApplicationContext(), GraphPage.class));
-                    overridePendingTransition(0, 0);
-                    return true;
-            }
-            return false;
+            if(item.getItemId() == R.id.calendar){
+                startActivity(new Intent(getApplicationContext(), CalendarPage.class));
+                overridePendingTransition(0, 0);
+                return true;
+            }else if(item.getItemId() == R.id.graph){
+                startActivity(new Intent(getApplicationContext(), GraphPage.class));
+                overridePendingTransition(0, 0);
+                return true;
+            }else return item.getItemId() == R.id.factorHome;
         });
     }
 
     private void loadUserDetails(){
-        logOut = findViewById(R.id.signOut);
+        progressBar = findViewById(R.id.progressBar);
+
+        Button logOut = findViewById(R.id.signOut);
         logOut.setOnClickListener(v -> {
             FirebaseAuth.getInstance().signOut();
             startActivity(new Intent(FactorPage.this, MainActivity.class));
         });
+
+        Button updateSleepFactorsButton = findViewById(R.id.sleepFactorSubmit);
+        updateSleepFactorsButton.setOnClickListener(v -> handleUpdateSleepFactors());
+
+        recyclerView = findViewById(R.id.sleepFactorRecyclerView);
 
         try {
             user = FirebaseAuth.getInstance().getCurrentUser();
@@ -83,7 +116,7 @@ public class FactorPage extends AppCompatActivity {
         }catch (IOException e){
             e.printStackTrace();
         }
-        userID = user.getUid();
+        String userID = user.getUid();
 
         reference.child(userID).addValueEventListener(new ValueEventListener() {
             @Override
@@ -97,62 +130,258 @@ public class FactorPage extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(FactorPage.this, "Something went wrong!", Toast.LENGTH_LONG).show();
+                Toast.makeText(FactorPage.this, "Signing Out", Toast.LENGTH_LONG).show();
             }
         });
+    }
 
-        if(updateUser) {
-            reference.child(userID).setValue(userProfile).addOnCompleteListener(taskDatabaseComms -> {
+    private void initDialogs(){
+        Sleep sleep = userProfile.getDailySleepFactors().get(userProfile.getCurrentDay().getDate());
+        sleepRating = findViewById(R.id.sleepRating);
+        if(sleep != null && sleep.getSleepQualityRating() > -1){
+            String rating = Integer.toString(sleep.getSleepQualityRating());
+            sleepRating.setText(rating);
+        }
+
+        sleepAmount = findViewById(R.id.sleepAmount);
+        sleepAmountDialog = new TimePickerDialog(
+                FactorPage.this,
+                (view, hourOfDay, minute) -> {
+                    amountHour = hourOfDay;
+                    amountMin = minute;
+
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.set(0, 0, 0, amountHour, amountMin);
+
+                    sleepAmount.setText(DateFormat.format("HH:mm", calendar));
+                }, 12, 0, true
+        );
+        sleepAmount.setInputType(InputType.TYPE_NULL);
+        sleepAmount.setOnClickListener(v -> {
+            sleepAmountDialog.updateTime(amountHour, amountMin);
+            sleepAmountDialog.show();
+        });
+        sleepAmount.setOnFocusChangeListener((v, hasFocus) ->{
+            if(hasFocus) {
+                sleepAmountDialog.updateTime(amountHour, amountMin);
+                sleepAmountDialog.show();
+            }
+        });
+        if(sleep != null && sleep.getNumberOfHoursSlept() > 0){
+            String hours = Integer.toString((int) Math.rint(sleep.getNumberOfHoursSlept()));
+            sleepAmount.setText(hours);
+        }
+
+        sleepStart = findViewById(R.id.sleepStart);
+        sleepStartDialog = new TimePickerDialog(
+                FactorPage.this,
+                (view, hourOfDay, minute) -> {
+                    startHour = hourOfDay;
+                    startMin = minute;
+
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.set(0, 0, 0, startHour, startMin);
+
+                    sleepStart.setText(DateFormat.format("HH:mm", calendar));
+                }, 12, 0, true
+        );
+        sleepStart.setInputType(InputType.TYPE_NULL);
+        sleepStart.setOnClickListener(v -> {
+            sleepStartDialog.updateTime(startHour, startMin);
+            sleepStartDialog.show();
+        });
+        sleepStart.setOnFocusChangeListener((v, hasFocus) ->{
+            if(hasFocus) {
+                sleepStartDialog.updateTime(startHour, startMin);
+                sleepStartDialog.show();
+            }
+        });
+        if(sleep != null && sleep.getTimeInBed() != null){
+            sleepStart.setText(sleep.getTimeInBed());
+        }
+
+        sleepEnd = findViewById(R.id.sleepEnd);
+        sleepEndDialog = new TimePickerDialog(
+                FactorPage.this,
+                (view, hourOfDay, minute) -> {
+                    endHour = hourOfDay;
+                    endMin = minute;
+
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.set(0, 0, 0, endHour, endMin);
+
+                    sleepEnd.setText(DateFormat.format("HH:mm", calendar));
+                }, 12, 0, true
+        );
+        sleepEnd.setInputType(InputType.TYPE_NULL);
+        sleepEnd.setOnClickListener(v -> {
+            sleepEndDialog.updateTime(endHour, endMin);
+            sleepEndDialog.show();
+        });
+        sleepEnd.setOnFocusChangeListener((v, hasFocus) ->{
+            if(hasFocus) {
+                sleepEndDialog.updateTime(endHour, endMin);
+                sleepEndDialog.show();
+            }
+        });
+        if(sleep != null && sleep.getTimeLeftBed() != null){
+            sleepEnd.setText(sleep.getTimeLeftBed());
+        }
+    }
+
+    private void handleUpdateSleepFactors() {
+        progressBar.setVisibility(View.VISIBLE);
+
+        Sleep currentSleep = userProfile.getDailySleepFactors().get(userProfile.getCurrentDay().getDate());
+        if(currentSleep == null){
+            currentSleep = new Sleep();
+        }
+
+        int rating = -1;
+        try {
+            rating = Integer.parseInt(sleepRating.getText().toString().trim());
+        }catch(NumberFormatException e){
+            e.printStackTrace();
+        }
+
+        BigDecimal tempDesc;
+        double amountOfHours = amountHour + (amountMin / 60.0);
+        tempDesc = new BigDecimal(amountOfHours).setScale(2, RoundingMode.HALF_EVEN);
+        amountOfHours = tempDesc.doubleValue();
+
+        if(!validator.numberOneToTen(rating, sleepRating)){
+            return;
+        }
+
+        currentSleep.setSleepQualityRating(rating);
+        currentSleep.setNumberOfHoursSlept(amountOfHours);
+        currentSleep.setTimeInBed(sleepStart.getText().toString().trim());
+        currentSleep.setTimeLeftBed(sleepEnd.getText().toString().trim());
+
+        for(View v : factorViewListEnabled){
+            String factor = ((TextView) v).getText().toString();
+            currentSleep.updateSleepFactor(factor, true);
+        }
+
+        for(View v : factorViewListDisabled){
+            String factor = ((TextView) v).getText().toString();
+            currentSleep.updateSleepFactor(factor, false);
+        }
+
+        if(!userProfile.getDates().contains(userProfile.getCurrentDay().getDate())) {
+            userProfile.getDates().add(userProfile.getCurrentDay().getDate());
+        }
+
+        userProfile.getDailySleepFactors().put(userProfile.getCurrentDay().getDate(), currentSleep);
+
+        try {
+            FirebaseDatabase.getInstance(Utils.getProperty("app.database", getApplicationContext())).getReference("Users")
+                    .child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid())
+                    .setValue(userProfile).addOnCompleteListener(taskDatabaseComms -> {
                 if (taskDatabaseComms.isSuccessful()) {
-                    Toast.makeText(FactorPage.this, "User has been updated!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(FactorPage.this, "User has been successfully updated!", Toast.LENGTH_LONG).show();
                 } else {
-                    Toast.makeText(FactorPage.this, "Error, user couldn't update", Toast.LENGTH_LONG).show();
+                    Toast.makeText(FactorPage.this, "Failed to update, try again!", Toast.LENGTH_LONG).show();
                 }
+                progressBar.setVisibility(View.GONE);
             });
-            updateUser = false;
+        }catch(IOException e){
+            e.printStackTrace();
+            //TODO make these logs
+            Toast.makeText(FactorPage.this, "Error, couldn't connect to database", Toast.LENGTH_LONG).show();
+        }catch(NullPointerException e){
+            e.printStackTrace();
+            //TODO make these logs
+            Toast.makeText(FactorPage.this, "Error, couldn't get account", Toast.LENGTH_LONG).show();
+        }finally {
+            progressBar.setVisibility(View.GONE);
         }
     }
 
     private void populateUserData(){
         final TextView welcomeTextView = findViewById(R.id.welcome);
-        final TextView fullNameTextView = findViewById(R.id.fullName);
-        final TextView emailTextView = findViewById(R.id.emailAddress);
-        final TextView ageTextView = findViewById(R.id.age);
         final TextView dayTextView = findViewById(R.id.day);
 
         String fullName = userProfile.fullName;
-        String email = userProfile.email;
-        String age = userProfile.age;
         Day d = userProfile.getCurrentDay();
         Day toCheck = new Day();
 
         if(!d.equals(toCheck)){
-            userProfile.createNewDay();
-            updateUser = true;
-//            reference.child(userID).setValue(userProfile).addOnCompleteListener(taskDatabaseComms -> {
-//                if (taskDatabaseComms.isSuccessful()) {
-//                    Toast.makeText(FactorPage.this, "User has been updated!", Toast.LENGTH_LONG).show();
-//                } else {
-//                    Toast.makeText(FactorPage.this, "Error, user couldn't update", Toast.LENGTH_LONG).show();
-//                }
-//            });
+            if(!userProfile.getDates().contains(d.getDate())){
+                userProfile.getDates().add(d.getDate());
+            }
+            userProfile.setCurrentDay(new Day());
+            String date = userProfile.getCurrentDay().getDate();
+            userProfile.getDailySleepFactors().put(date, new Sleep());
+            userProfile.getDates().add(date);
         }
 
         String welcomeText = "Welcome, " + fullName + "!";
         welcomeTextView.setText(welcomeText);
-        fullNameTextView.setText(fullName);
-        emailTextView.setText(email);
-        ageTextView.setText(age);
         dayTextView.setText(userProfile.getDate());
+
+        initDialogs();
+        if(loadFactors) {
+            setFactorInfo();
+            setAdaptor();
+            loadFactors = false;
+        }
     }
 
-//    private void updateUser(){
-//        reference.child(userID).setValue(userProfile).addOnCompleteListener(taskDatabaseComms -> {
-//            if (taskDatabaseComms.isSuccessful()) {
-//                Toast.makeText(FactorPage.this, "User has been updated!", Toast.LENGTH_LONG).show();
-//            } else {
-//                Toast.makeText(FactorPage.this, "Error, user couldn't update", Toast.LENGTH_LONG).show();
-//            }
-//        });
-//    }
+    private void setFactorInfo(){
+        String[] sleepFactors = getResources().getStringArray(R.array.sleep_factors);
+        for(String s : sleepFactors){
+            Factor f = new Factor(s);
+            if(!factorsList.contains(f)) {
+                factorsList.add(f);
+            }
+        }
+    }
+
+    private void setAdaptor() {
+        setRecyclerViewOnClickListener();
+        FactorRecyclerAdaptor adaptor = new FactorRecyclerAdaptor(factorsList, listener);
+        RecyclerView.LayoutManager  layoutManager = new LinearLayoutManager(getApplicationContext());
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setAdapter(adaptor);
+    }
+
+    private void setRecyclerViewOnClickListener(){
+        listener = (v, position) -> {
+            if (v.getBackground() instanceof ColorDrawable) {
+                ColorDrawable cd = (ColorDrawable) v.getBackground();
+
+                TextView tv = v.findViewById(R.id.factorHolder);
+
+                if (cd.getColor() == getResources().getColor(R.color.factorUnselected)){
+                    v.setBackgroundColor(getResources().getColor(R.color.factorSelected));
+                    if(!factorViewListEnabled.contains(tv)) {
+                        factorViewListEnabled.add(tv);
+                    }
+                    factorViewListDisabled.remove(tv);
+                }else{
+                    v.setBackgroundColor(getResources().getColor(R.color.factorUnselected));
+                    if(!factorViewListDisabled.contains(tv)) {
+                        factorViewListDisabled.add(tv);
+                    }
+                    factorViewListEnabled.remove(tv);
+                }
+            }
+        };
+    }
+
+    public User getUserProfile(){
+        return userProfile;
+    }
+
+    public void addTextViewFactorToFactorViewListEnabled(TextView tv){
+        if(!factorViewListEnabled.contains(tv)) {
+            factorViewListEnabled.add(tv);
+        }
+    }
+
+    public ArrayList<TextView> getFactorViewListEnabled() {
+        return factorViewListEnabled;
+    }
 }

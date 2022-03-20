@@ -1,6 +1,5 @@
 package com.nuigalway.bct.mood_insights.util;
 
-import android.annotation.SuppressLint;
 import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,33 +14,43 @@ import com.nuigalway.bct.mood_insights.FactorPage;
 import com.nuigalway.bct.mood_insights.R;
 import com.nuigalway.bct.mood_insights.data.Factor;
 import com.nuigalway.bct.mood_insights.data.Sleep;
-import com.nuigalway.bct.mood_insights.user.User;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 @RequiresApi(api = Build.VERSION_CODES.O)
 public class FactorRecyclerAdaptor extends RecyclerView.Adapter<FactorRecyclerAdaptor.MyViewHolder> {
 
-    private ArrayList<Factor> factorsList;
-    private FactoryRecyclerViewClickListener listener;
+    private final ArrayList<Factor> factorsList;
+    private final FactoryRecyclerViewClickListener listener;
+    private FactorPage fp;
+    private Sleep currentSleepFactors;
 
-    public FactorRecyclerAdaptor(ArrayList<Factor> factorsList, FactoryRecyclerViewClickListener listener){
+    public FactorRecyclerAdaptor(ArrayList<Factor> factorsList, FactoryRecyclerViewClickListener listener, FactorPage fp){
         this.factorsList = factorsList;
         this.listener = listener;
+        this.fp = fp;
+        currentSleepFactors = fp.getCurrentSleep();
     }
 
     @NonNull
     @Override
     public FactorRecyclerAdaptor.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_factors, parent, false);
-        itemView.setBackgroundColor(parent.getContext().getResources().getColor(R.color.factorUnselected));
-        return new MyViewHolder(itemView);
+        //itemView.setBackgroundColor(parent.getContext().getResources().getColor(R.color.factorUnselected));
+        return new MyViewHolder(itemView, parent);
     }
 
     @Override
     public void onBindViewHolder(@NonNull FactorRecyclerAdaptor.MyViewHolder holder, int position) {
         String factor = factorsList.get(position).getFactorName();
         holder.factorNameText.setText(factor);
+        if(currentSleepFactors.getSleepFactorValue(factor)){
+            holder.getView().setBackgroundColor(holder.getParent().getContext().getResources().getColor(R.color.factorSelected));
+            fp.addTextViewFactorToFactorViewListEnabled(holder.factorNameText);
+        }else{
+            holder.getView().setBackgroundColor(holder.getParent().getContext().getResources().getColor(R.color.factorUnselected));
+        }
     }
 
     @Override
@@ -49,13 +58,26 @@ public class FactorRecyclerAdaptor extends RecyclerView.Adapter<FactorRecyclerAd
         return factorsList.size();
     }
 
-    public class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
-        private TextView factorNameText;
 
-        public MyViewHolder(final View view){
+    public class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+        private final TextView factorNameText;
+        private final ViewGroup parent;
+        private final View view;
+
+        public MyViewHolder(final View view, ViewGroup parent){
             super(view);
+            this.parent = parent;
+            this.view = view;
             factorNameText = view.findViewById(R.id.factorHolder);
             view.setOnClickListener(this);
+        }
+
+        public View getParent(){
+            return parent;
+        }
+
+        public View getView(){
+            return view;
         }
 
         @Override

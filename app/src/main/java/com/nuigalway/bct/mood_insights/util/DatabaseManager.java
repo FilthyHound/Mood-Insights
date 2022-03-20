@@ -1,6 +1,4 @@
-package com.nuigalway.bct.mood_insights.util;
-
-import android.provider.ContactsContract;
+package com.nuigalway.bct.mood_insights.util;;
 
 public class DatabaseManager {
     private static DatabaseManager instance;
@@ -15,4 +13,5 @@ public class DatabaseManager {
         }
         return instance;
     }
+
 }

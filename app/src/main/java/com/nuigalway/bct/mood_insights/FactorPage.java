@@ -38,8 +38,6 @@ import com.nuigalway.bct.mood_insights.util.Utils;
 import com.nuigalway.bct.mood_insights.validation.Validator;
 
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Objects;
@@ -65,8 +63,8 @@ public class FactorPage extends AppCompatActivity {
     private EditText sleepAmount;
     private EditText sleepStart;
     private EditText sleepEnd;
-    private TimePickerDialog sleepAmountDialog, sleepStartDialog, sleepEndDialog;
-    private int amountHour = -1, amountMin = -1, startHour = -1, startMin = -1, endHour = -1, endMin = -1;
+    private TimePickerDialog sleepStartDialog, sleepEndDialog;
+    private int startHour = -1, startMin = -1, endHour = -1, endMin = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -144,30 +142,7 @@ public class FactorPage extends AppCompatActivity {
         }
 
         sleepAmount = findViewById(R.id.sleepAmount);
-        sleepAmountDialog = new TimePickerDialog(
-                FactorPage.this,
-                (view, hourOfDay, minute) -> {
-                    amountHour = hourOfDay;
-                    amountMin = minute;
-
-                    Calendar calendar = Calendar.getInstance();
-                    calendar.set(0, 0, 0, amountHour, amountMin);
-
-                    sleepAmount.setText(DateFormat.format("HH:mm", calendar));
-                }, 12, 0, true
-        );
-        sleepAmount.setInputType(InputType.TYPE_NULL);
-        sleepAmount.setOnClickListener(v -> {
-            sleepAmountDialog.updateTime(amountHour, amountMin);
-            sleepAmountDialog.show();
-        });
-        sleepAmount.setOnFocusChangeListener((v, hasFocus) ->{
-            if(hasFocus) {
-                sleepAmountDialog.updateTime(amountHour, amountMin);
-                sleepAmountDialog.show();
-            }
-        });
-        if(sleep != null && sleep.getNumberOfHoursSlept() > 0){
+        if(sleep != null && sleep.getNumberOfHoursSlept() > -1){
             String hours = Integer.toString((int) Math.rint(sleep.getNumberOfHoursSlept()));
             sleepAmount.setText(hours);
         }
@@ -237,30 +212,30 @@ public class FactorPage extends AppCompatActivity {
             currentSleep = new Sleep();
         }
 
-        int rating = -1;
+        int rating = -1, amount = -1;
         try {
             rating = Integer.parseInt(sleepRating.getText().toString().trim());
+            amount = Integer.parseInt(sleepAmount.getText().toString().trim());
         }catch(NumberFormatException e){
             e.printStackTrace();
         }
 
-        BigDecimal tempDesc;
-        double amountOfHours = amountHour + (amountMin / 60.0);
-        tempDesc = new BigDecimal(amountOfHours).setScale(2, RoundingMode.HALF_EVEN);
-        amountOfHours = tempDesc.doubleValue();
-
-        if(!validator.numberOneToTen(rating, sleepRating)){
+        if(!validator.numberOneToTen(rating, sleepRating) || !validator.isNumberOneToTwentyThree(amount, sleepAmount)){
             return;
         }
 
         currentSleep.setSleepQualityRating(rating);
-        currentSleep.setNumberOfHoursSlept(amountOfHours);
+        currentSleep.setNumberOfHoursSlept(amount);
         currentSleep.setTimeInBed(sleepStart.getText().toString().trim());
         currentSleep.setTimeLeftBed(sleepEnd.getText().toString().trim());
 
         for(View v : factorViewListEnabled){
             String factor = ((TextView) v).getText().toString();
-            currentSleep.updateSleepFactor(factor, true);
+            if(currentSleep.containsSleepFactor(factor)){
+                currentSleep.updateSleepFactor(factor, true);
+            }else{
+                currentSleep.addSleepFactor(factor);
+            }
         }
 
         for(View v : factorViewListDisabled){
@@ -272,13 +247,14 @@ public class FactorPage extends AppCompatActivity {
             userProfile.getDates().add(userProfile.getCurrentDay().getDate());
         }
 
-        userProfile.getDailySleepFactors().put(userProfile.getCurrentDay().getDate(), currentSleep);
+        String dateKey = userProfile.getDate();
+        userProfile.getDailySleepFactors().put(dateKey, currentSleep);
 
         try {
             FirebaseDatabase.getInstance(Utils.getProperty("app.database", getApplicationContext())).getReference("Users")
                     .child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid())
-                    .setValue(userProfile).addOnCompleteListener(taskDatabaseComms -> {
-                if (taskDatabaseComms.isSuccessful()) {
+                    .setValue(userProfile).addOnCompleteListener(taskDatabaseCommunications -> {
+                if (taskDatabaseCommunications.isSuccessful()) {
                     Toast.makeText(FactorPage.this, "User has been successfully updated!", Toast.LENGTH_LONG).show();
                 } else {
                     Toast.makeText(FactorPage.this, "Failed to update, try again!", Toast.LENGTH_LONG).show();
@@ -340,13 +316,16 @@ public class FactorPage extends AppCompatActivity {
 
     private void setAdaptor() {
         setRecyclerViewOnClickListener();
-        FactorRecyclerAdaptor adaptor = new FactorRecyclerAdaptor(factorsList, listener);
+        FactorRecyclerAdaptor adaptor = new FactorRecyclerAdaptor(factorsList, listener, this);
         RecyclerView.LayoutManager  layoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(adaptor);
     }
 
+    /**
+     * Method sets the functionality for when an element in the factor list is clicked
+     */
     private void setRecyclerViewOnClickListener(){
         listener = (v, position) -> {
             if (v.getBackground() instanceof ColorDrawable) {
@@ -371,17 +350,13 @@ public class FactorPage extends AppCompatActivity {
         };
     }
 
-    public User getUserProfile(){
-        return userProfile;
+    public Sleep getCurrentSleep(){
+        return userProfile.dailySleepFactors.get(userProfile.getDate());
     }
 
     public void addTextViewFactorToFactorViewListEnabled(TextView tv){
         if(!factorViewListEnabled.contains(tv)) {
             factorViewListEnabled.add(tv);
         }
-    }
-
-    public ArrayList<TextView> getFactorViewListEnabled() {
-        return factorViewListEnabled;
     }
 }

@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 public class Sleep {
-    private double numberOfHoursSlept;
+    private int numberOfHoursSlept;
     private int sleepQualityRating;
     private String timeInBed, timeLeftBed;
     private final Map<String, Boolean> sleepFactors;
@@ -19,7 +19,7 @@ public class Sleep {
 
     public void addSleepFactor(String factor){
         if(!sleepFactors.containsKey(factor)){
-            sleepFactors.put(factor, false);
+            sleepFactors.put(factor, true);
         }
     }
 
@@ -42,6 +42,10 @@ public class Sleep {
         return false;
     }
 
+    public Boolean containsSleepFactor(String factor){
+        return sleepFactors.containsKey(factor);
+    }
+
     public Map<String, Boolean> getSleepFactors(){
         return sleepFactors;
     }
@@ -50,7 +54,7 @@ public class Sleep {
         return numberOfHoursSlept;
     }
 
-    public void setNumberOfHoursSlept(double numberOfHoursSlept) {
+    public void setNumberOfHoursSlept(int numberOfHoursSlept) {
         this.numberOfHoursSlept = numberOfHoursSlept;
     }
 

@@ -93,7 +93,7 @@
             android:layout_width="140dp"
             android:layout_height="48dp"
             android:layout_marginTop="10dp"
-            android:hint="08:30"
+            android:hint="In Hours"
             android:textSize="20sp"
             app:layout_constraintLeft_toRightOf="@id/SleepAmountTitle"
             app:layout_constraintTop_toBottomOf="@id/SleepRatingTitle"

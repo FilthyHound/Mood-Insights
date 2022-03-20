@@ -67,4 +67,13 @@ public class Validator {
         }
         return true;
     }
+
+    public boolean isNumberOneToTwentyThree(Integer s, EditText eT){
+        if(s < 1 || s > 23){
+            eT.setError(ERROR_NUMBER);
+            eT.requestFocus();
+            return false;
+        }
+        return true;
+    }
 }

@@ -1,6 +1,5 @@
 package com.nuigalway.bct.mood_insights;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -16,14 +15,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.nuigalway.bct.mood_insights.validation.Validator;
 
-import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
-    private FirebaseUser user;
-    private TextView register, forgotPassword;
     private EditText editTextEmail, editTextPassword;
-    private Button signIn;
 
     private FirebaseAuth mAuth;
     private ProgressBar progressBar;
@@ -33,13 +28,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        register = findViewById(R.id.register);
+        TextView register = findViewById(R.id.register);
         register.setOnClickListener(this);
 
-        forgotPassword = findViewById(R.id.forgotPassword);
+        TextView forgotPassword = findViewById(R.id.forgotPassword);
         forgotPassword.setOnClickListener(this);
 
-        signIn = findViewById(R.id.signIn);
+        Button signIn = findViewById(R.id.signIn);
         signIn.setOnClickListener(this);
 
         editTextEmail = findViewById(R.id.email);
@@ -48,29 +43,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         progressBar = findViewById(R.id.progressBar);
 
         mAuth = FirebaseAuth.getInstance();
-
-//        // Check if there is a user currently signed in already
-//        user = FirebaseAuth.getInstance().getCurrentUser();
-//        if(user != null){
-//            // Redirect to Factor Page
-//            startActivity(new Intent(MainActivity.this, FactorPage.class));
-//        }else {
-//
-//        }
     }
 
     @Override
     public void onClick(View v) {
-        switch(v.getId()){
-            case R.id.register:
-                startActivity(new Intent(this, RegisterUser.class));
-                break;
-            case R.id.signIn:
-                userLogin();
-                break;
-            case R.id.forgotPassword:
-                startActivity(new Intent(this, ForgotPassword.class));
-                break;
+        if(v.getId() == R.id.register){
+            startActivity(new Intent(this, RegisterUser.class));
+        }else if(v.getId() == R.id.signIn){
+            userLogin();
+        }else if(v.getId() == R.id.forgotPassword){
+            startActivity(new Intent(this, ForgotPassword.class));
         }
     }
 
@@ -79,8 +61,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         String email = editTextEmail.getText().toString().trim();
         String password = editTextPassword.getText().toString().trim();
 
-        if (!v.emailValidation(email, editTextEmail)
-                || !v.passwordValidation(password, editTextPassword)) {
+        if (!v.isEmailValid(email, editTextEmail)
+                || !v.isPasswordValid(password, editTextPassword)) {
             return;
         }
 
@@ -99,7 +81,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void emailVerificationHandler(){
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if(user != null) {
-            if (user.isEmailVerified() || checkSendEmailVerification(user)) {
+            if (user.isEmailVerified()) {
                 Toast.makeText(MainActivity.this, "User has signed in successfully!", Toast.LENGTH_LONG).show();
                 progressBar.setVisibility(View.GONE);
                 //redirect to factors page
@@ -113,12 +95,5 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Toast.makeText(MainActivity.this, "No account, please register an account first!", Toast.LENGTH_LONG).show();
             progressBar.setVisibility(View.GONE);
         }
-    }
-
-    private boolean checkSendEmailVerification(@NonNull FirebaseUser user){
-        Long userDate = Objects.requireNonNull(user.getMetadata()).getCreationTimestamp();
-        Long lastSignIn = user.getMetadata().getLastSignInTimestamp();
-        // 4 hours to verify
-        return lastSignIn - userDate < 3600000L;
     }
 }

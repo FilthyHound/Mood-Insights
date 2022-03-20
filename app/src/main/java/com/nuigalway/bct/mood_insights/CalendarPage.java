@@ -17,19 +17,15 @@ public class CalendarPage extends AppCompatActivity {
         BottomNavigationView bottomNavigationView = findViewById(R.id.navView);
         bottomNavigationView.setSelectedItemId(R.id.calendar);
         bottomNavigationView.setOnItemSelectedListener(item -> {
-            switch (item.getItemId()){
-                case R.id.calendar:
-                    return true;
-                case R.id.factorHome:
-                    startActivity(new Intent(getApplicationContext(), FactorPage.class));
-                    overridePendingTransition(0, 0);
-                    return true;
-                case R.id.graph:
-                    startActivity(new Intent(getApplicationContext(), GraphPage.class));
-                    overridePendingTransition(0, 0);
-                    return true;
-            }
-            return false;
+            if(item.getItemId() == R.id.factorHome){
+                startActivity(new Intent(getApplicationContext(), FactorPage.class));
+                overridePendingTransition(0, 0);
+                return true;
+            }else if (item.getItemId() == R.id.graph){
+                startActivity(new Intent(getApplicationContext(), GraphPage.class));
+                overridePendingTransition(0, 0);
+                return true;
+            }else return item.getItemId() == R.id.calendar;
         });
     }
 }

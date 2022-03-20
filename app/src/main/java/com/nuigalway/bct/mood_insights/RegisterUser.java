@@ -25,7 +25,6 @@ import java.util.Objects;
 @RequiresApi(api = Build.VERSION_CODES.O)
 public class RegisterUser extends AppCompatActivity implements View.OnClickListener{
 
-    private TextView title, registerUser;
     private EditText editTextFullName, editTextAge, editTextEmail, editTextPassword;
     private ProgressBar progressBar;
 
@@ -38,10 +37,10 @@ public class RegisterUser extends AppCompatActivity implements View.OnClickListe
 
         mAuth = FirebaseAuth.getInstance();
 
-        title = findViewById(R.id.title);
+        TextView title = findViewById(R.id.title);
         title.setOnClickListener(this);
 
-        registerUser = findViewById(R.id.registerUser);
+        TextView registerUser = findViewById(R.id.registerUser);
         registerUser.setOnClickListener(this);
 
         editTextFullName = findViewById(R.id.fullName);
@@ -54,13 +53,10 @@ public class RegisterUser extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
-            case R.id.title:
-                startActivity(new Intent(this, MainActivity.class));
-                break;
-            case R.id.registerUser:
-                registerUser();
-                break;
+        if(v.getId() == R.id.title){
+            startActivity(new Intent(this, MainActivity.class));
+        }else if(v.getId() == R.id.registerUser){
+            registerUser();
         }
     }
 
@@ -73,8 +69,8 @@ public class RegisterUser extends AppCompatActivity implements View.OnClickListe
 
         if(!v.genericStringValidation(fullName, editTextFullName)
                 || !v.ageStringValidation(age, editTextAge)
-                || !v.emailValidation(email, editTextEmail)
-                || !v.passwordValidation(password, editTextPassword)){
+                || !v.isEmailValid(email, editTextEmail)
+                || !v.isPasswordValid(password, editTextPassword)){
             Toast.makeText(RegisterUser.this, "Validation error, try again", Toast.LENGTH_LONG).show();
             return;
         }
@@ -84,6 +80,10 @@ public class RegisterUser extends AppCompatActivity implements View.OnClickListe
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(taskCreateUser -> {
                     if(taskCreateUser.isSuccessful()){
+                        sendEmailVerification();
+                        progressBar.setVisibility(View.GONE);
+
+                        //redirect to login activity
                         handleSuccessfulUserCreation(fullName, age, email);
                     }else{
                         Toast.makeText(RegisterUser.this, "Failed to Register! First Task!", Toast.LENGTH_LONG).show();
@@ -101,12 +101,11 @@ public class RegisterUser extends AppCompatActivity implements View.OnClickListe
                     .setValue(user).addOnCompleteListener(taskDatabaseComms -> {
                 if (taskDatabaseComms.isSuccessful()) {
                     Toast.makeText(RegisterUser.this, "User has been registered successfully!", Toast.LENGTH_LONG).show();
-                    sendEmailVerification();
                     //TODO send email verification
                     progressBar.setVisibility(View.GONE);
 
-                    //redirect to login activity
-                    startActivity(new Intent(RegisterUser.this, MainActivity.class));
+                    //redirect to Email Verification prompt activity
+                    startActivity(new Intent(RegisterUser.this, EmailVerification.class));
                 } else {
                     Toast.makeText(RegisterUser.this, "Failed to Register! Second Task!", Toast.LENGTH_LONG).show();
                     progressBar.setVisibility(View.GONE);

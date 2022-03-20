@@ -11,8 +11,8 @@
         android:id="@+id/title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Mood Insights"
-        android:textSize="60sp"
+        android:text="@string/app_name"
+        android:textSize="50sp"
         android:textAlignment="center"
         android:textStyle="bold"
         android:fontFamily="sans-serif-black"
@@ -20,13 +20,14 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/titleDescription"
         />
 
     <TextView
         android:id="@+id/titleDescription"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Track your moods"
+        android:text="@string/mood_insight_blurb"
         android:textSize="18sp"
         android:textAlignment="center"
         android:textStyle="italic"
@@ -40,13 +41,13 @@
         android:layout_width="380dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="60dp"
-        android:hint="Email Address"
+        android:hint="@string/user_email_address"
+        android:autofillHints=""
         android:inputType="textEmailAddress"
         android:textSize="24sp"
         app:layout_constraintTop_toBottomOf="@id/titleDescription"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        />
+        app:layout_constraintRight_toRightOf="parent" />
 
     <EditText
         android:id="@+id/password"
@@ -56,11 +57,11 @@
         android:ems="10"
         android:inputType="textPassword"
         android:textSize="24sp"
-        android:hint="Password"
+        android:hint="@string/user_password"
+        android:autofillHints=""
         app:layout_constraintTop_toBottomOf="@id/email"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        />
+        app:layout_constraintRight_toRightOf="parent" />
 
     <Button
         android:id="@+id/signIn"
@@ -68,7 +69,7 @@
         android:layout_height="70dp"
         android:layout_marginTop="24dp"
         android:backgroundTint="@color/purple_700"
-        android:text="Login"
+        android:text="@string/button_login"
         android:textColor="@color/white"
         android:textSize="26sp"
         android:textStyle="bold"
@@ -84,7 +85,7 @@
         android:layout_marginStart="50dp"
         android:layout_marginTop="25dp"
         android:layout_weight="2"
-        android:text="Forgot Password?"
+        android:text="@string/login_forgot_password"
         android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintTop_toBottomOf="@id/signIn"
@@ -95,25 +96,14 @@
         android:id="@+id/register"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="80dp"
+        android:layout_marginStart="80dp"
         android:layout_weight="2"
-        android:text="Register"
+        android:text="@string/login_register"
         android:textSize="16sp"
         android:textStyle="bold"
         app:layout_constraintTop_toTopOf="@id/forgotPassword"
         app:layout_constraintLeft_toRightOf="@id/forgotPassword"
         />
-
-<!--    <com.google.android.gms.common.SignInButton-->
-<!--        android:id="@+id/googleSignIn"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_marginTop="50dp"-->
-<!--        app:layout_constraintTop_toBottomOf="@id/signIn"-->
-<!--        app:layout_constraintLeft_toLeftOf="parent"-->
-<!--        app:layout_constraintRight_toRightOf="parent"-->
-<!--        tools:ignore="MissingConstraints"-->
-<!--        />-->
 
     <ProgressBar
         android:id="@+id/progressBar"

@@ -1,3 +1,55 @@
 <resources>
     <string name="app_name">Mood-Insights</string>
+    <string name="mood_insight_blurb">Track your moods</string>
+    <string name="email_verification_message">Please check your email address to verify your account before proceeding!</string>
+    <string name="button_continue">Continue</string>
+    <string name="user_full_name">Full Name</string>
+    <string name="user_age">Age</string>
+    <string name="user_email_address">Email Address</string>
+    <string name="user_password">Password</string>
+    <string name="button_register">Register</string>
+    <string name="button_login">Login</string>
+    <string name="button_logout">Log Out</string>
+    <string name="login_forgot_password">Forgot Password?</string>
+    <string name="login_register">Register</string>
+    <string name="forgot_password_enter_your_email">Enter your Email</string>
+    <string name="button_reset_password">Reset Password</string>
+
+    <!-- Sleep Values -->
+    <string name="sleep_bed_early">early bedtime</string>
+    <string name="sleep_bed_late">late bedtime</string>
+    <string name="sleep_woke_early">woke early</string>
+    <string name="sleep_woke_refreshed">woke refreshed</string>
+    <string name="sleep_woke_tired">woke still tired</string>
+    <string name="sleep_could_not_begin">could not fall asleep</string>
+    <string name="sleep_could_not_stay">could not stay asleep</string>
+    <string name="sleep_nightmare">nightmare</string>
+    <string name="sleep_overslept">overslept</string>
+    <string name="factor_page_welcome">Welcome!</string>
+    <string name="factor_page_day">Day:</string>
+
+    <!-- Factor Page -->
+    <string name="sleep_factor_group_title">Sleep Factors</string>
+    <string name="sleep_factor_rating_title">Sleep Rating:</string>
+    <string name="sleep_factor_rating_hint">from 1 - 10</string>
+    <string name="sleep_factor_amount_title">Time Asleep:</string>
+    <string name="sleep_factor_amount_hint">In Hours</string>
+    <string name="sleep_factor_start_title">Went to sleep at:</string>
+    <string name="sleep_factor_start_hint">10:30</string>
+    <string name="sleep_factor_end_title">Woke up at</string>
+    <string name="sleep_factor_end_hint">08:30</string>
+    <string name="sleep_factors_title">Factors:</string>
+    <string name="button_update_sleep_factors">Update Sleep Factors</string>
+
+    <string-array name="sleep_factors">
+        <item>@string/sleep_bed_early</item>
+        <item>@string/sleep_bed_late</item>
+        <item>@string/sleep_woke_early</item>
+        <item>@string/sleep_woke_refreshed</item>
+        <item>@string/sleep_woke_tired</item>
+        <item>@string/sleep_could_not_begin</item>
+        <item>@string/sleep_could_not_stay</item>
+        <item>@string/sleep_nightmare</item>
+        <item>@string/sleep_overslept</item>
+    </string-array>
 </resources>

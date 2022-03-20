@@ -1,15 +1,17 @@
 package com.nuigalway.bct.mood_insights.data;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Sleep {
-
-    private double numberOfHoursSlept;
+    private int numberOfHoursSlept;
     private int sleepQualityRating;
     private String timeInBed, timeLeftBed;
-    private final Map<String, Integer> sleepFactors;
+    private final Map<String, Boolean> sleepFactors;
 
     public Sleep(){
         sleepFactors = new HashMap<>();
@@ -17,22 +19,34 @@ public class Sleep {
 
     public void addSleepFactor(String factor){
         if(!sleepFactors.containsKey(factor)){
-            sleepFactors.put(factor, 0);
+            sleepFactors.put(factor, true);
         }
+    }
+
+    public boolean updateSleepFactor(String factor, boolean condition){
+        if(sleepFactors.containsKey(factor)){
+            sleepFactors.put(factor, condition);
+            return true;
+        }
+        return false;
     }
 
     public void removeSleepFactor(String factor){
          sleepFactors.remove(factor);
     }
 
-    public Integer getSleepFactorValue(String factor){
+    public Boolean getSleepFactorValue(String factor){
         if(sleepFactors.containsKey(factor)){
             return sleepFactors.get(factor);
         }
-        return -1;
+        return false;
     }
 
-    public Map<String, Integer> getSleepFactors(){
+    public Boolean containsSleepFactor(String factor){
+        return sleepFactors.containsKey(factor);
+    }
+
+    public Map<String, Boolean> getSleepFactors(){
         return sleepFactors;
     }
 
@@ -40,7 +54,7 @@ public class Sleep {
         return numberOfHoursSlept;
     }
 
-    public void setNumberOfHoursSlept(double numberOfHoursSlept) {
+    public void setNumberOfHoursSlept(int numberOfHoursSlept) {
         this.numberOfHoursSlept = numberOfHoursSlept;
     }
 

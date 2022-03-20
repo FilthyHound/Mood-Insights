@@ -76,7 +76,7 @@ public class ValidatorTest {
 
     @Test
     public void testEmailValidation_ValidEmails() {
-        VALID_EMAIL_LIST.forEach(e -> assertTrue(target.emailValidation(e, mockEditText)));
+        VALID_EMAIL_LIST.forEach(e -> assertTrue(target.isEmailValid(e, mockEditText)));
 
         verify(mockEditText, times(0)).setError(anyString());
         verify(mockEditText, times(0)).requestFocus();
@@ -84,7 +84,7 @@ public class ValidatorTest {
 
     @Test
     public void testEmailValidation_InvalidEmails() {
-        INVALID_EMAIL_LIST.forEach(e -> assertFalse(target.emailValidation(e, mockEditText)));
+        INVALID_EMAIL_LIST.forEach(e -> assertFalse(target.isEmailValid(e, mockEditText)));
 
         verify(mockEditText, times(INVALID_EMAIL_LIST.size())).setError(
                 eq("Please provide a valid email address!"));

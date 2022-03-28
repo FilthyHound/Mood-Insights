@@ -33,11 +33,13 @@ import com.nuigalway.bct.mood_insights.data.Day;
 import com.nuigalway.bct.mood_insights.data.Factor;
 import com.nuigalway.bct.mood_insights.data.Sleep;
 import com.nuigalway.bct.mood_insights.user.User;
+import com.nuigalway.bct.mood_insights.util.DatabaseManager;
 import com.nuigalway.bct.mood_insights.util.FactorRecyclerAdaptor;
 import com.nuigalway.bct.mood_insights.util.Utils;
 import com.nuigalway.bct.mood_insights.validation.Validator;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Objects;
@@ -54,6 +56,7 @@ public class FactorPage extends AppCompatActivity {
 
     // Sleep Factor Variables
     private Validator validator;
+    private DatabaseManager db;
     private final ArrayList<Factor> factorsList = new ArrayList<>();
     private final ArrayList<TextView> factorViewListEnabled = new ArrayList<>();
     private final ArrayList<TextView> factorViewListDisabled = new ArrayList<>();
@@ -83,11 +86,15 @@ public class FactorPage extends AppCompatActivity {
         bottomNavigationView.setSelectedItemId(R.id.factorHome);
         bottomNavigationView.setOnItemSelectedListener(item -> {
             if(item.getItemId() == R.id.calendar){
-                startActivity(new Intent(getApplicationContext(), CalendarPage.class));
+                Intent calendar = new Intent(getApplicationContext(), CalendarPage.class);
+                calendar.putExtra(Utils.USER_KEY, userProfile);
+                startActivity(calendar);
                 overridePendingTransition(0, 0);
                 return true;
             }else if(item.getItemId() == R.id.graph){
-                startActivity(new Intent(getApplicationContext(), GraphPage.class));
+                Intent graph = new Intent(getApplicationContext(), GraphPage.class);
+                graph.putExtra(Utils.USER_KEY, userProfile);
+                startActivity(graph);
                 overridePendingTransition(0, 0);
                 return true;
             }else return item.getItemId() == R.id.factorHome;
@@ -114,14 +121,25 @@ public class FactorPage extends AppCompatActivity {
         }catch (IOException e){
             e.printStackTrace();
         }
-        String userID = user.getUid();
 
-        reference.child(userID).addValueEventListener(new ValueEventListener() {
+        // Try to get the user profile if coming from the graph or calendar page
+        userProfile = (User) getIntent().getSerializableExtra(Utils.USER_KEY);
+
+        if(userProfile == null){
+            String userId = user.getUid();
+            getUserFromDatabase(userId);
+        }else{
+            populateUserData();
+        }
+    }
+
+    private void getUserFromDatabase(String userId){
+        reference.child(userId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 userProfile = snapshot.getValue((User.class));
 
-                if(userProfile != null){
+                if (userProfile != null) {
                     populateUserData();
                 }
             }

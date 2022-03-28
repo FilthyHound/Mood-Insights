@@ -4,12 +4,13 @@ import android.os.Build;
 
 import androidx.annotation.RequiresApi;
 
+import java.io.Serializable;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.Month;
 
 @RequiresApi(api = Build.VERSION_CODES.O)
-public class Day{
+public class Day implements Serializable {
     private final LocalDate instance;
 
     public Day(){

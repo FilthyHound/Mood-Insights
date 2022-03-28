@@ -7,12 +7,13 @@ import androidx.annotation.RequiresApi;
 import com.nuigalway.bct.mood_insights.data.Day;
 import com.nuigalway.bct.mood_insights.data.Sleep;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 @RequiresApi(api = Build.VERSION_CODES.O)
-public class User {
+public class User implements Serializable {
     public final ArrayList<String> dates = new ArrayList<>();
     public final Map<String, Sleep> dailySleepFactors = new HashMap<>();
 

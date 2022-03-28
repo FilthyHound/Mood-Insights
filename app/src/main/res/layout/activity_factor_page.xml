@@ -6,6 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"> <!--IMPORTANT otherwise background img. will not fill the whole screen -->
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -71,7 +72,7 @@
             android:layout_width="140dp"
             android:layout_height="48dp"
             android:hint="@string/sleep_factor_rating_hint"
-            android:autofillHints=""
+            android:importantForAutofill="no"
             android:inputType="number"
             android:textSize="20sp"
             app:layout_constraintLeft_toRightOf="@id/SleepRatingTitle"
@@ -97,7 +98,7 @@
             android:layout_height="48dp"
             android:layout_marginTop="10dp"
             android:hint="@string/sleep_factor_amount_hint"
-            android:autofillHints=""
+            android:importantForAutofill="no"
             android:inputType="number"
             android:textSize="20sp"
             app:layout_constraintLeft_toRightOf="@id/SleepAmountTitle"
@@ -120,7 +121,7 @@
             android:layout_height="48dp"
             android:layout_marginTop="10dp"
             android:hint="@string/sleep_factor_start_hint"
-            android:autofillHints=""
+            android:importantForAutofill="no"
             android:textSize="20sp"
             android:inputType="time"
             app:layout_constraintLeft_toRightOf="@id/sleepStartTitle"
@@ -145,7 +146,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="48dp"
             android:hint="@string/sleep_factor_end_hint"
-            android:autofillHints=""
+            android:importantForAutofill="no"
             android:textSize="20sp"
             android:inputType="time"
             app:layout_constraintLeft_toRightOf="@id/sleepEndTitle"

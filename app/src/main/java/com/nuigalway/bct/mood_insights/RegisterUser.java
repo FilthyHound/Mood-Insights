@@ -70,7 +70,7 @@ public class RegisterUser extends AppCompatActivity implements View.OnClickListe
         if(!v.genericStringValidation(fullName, editTextFullName)
                 || !v.ageStringValidation(age, editTextAge)
                 || !v.isEmailValid(email, editTextEmail)
-                || !v.isPasswordValid(password, editTextPassword)){
+                || v.isPasswordInvalid(password, editTextPassword)){
             Toast.makeText(RegisterUser.this, "Validation error, try again", Toast.LENGTH_LONG).show();
             return;
         }

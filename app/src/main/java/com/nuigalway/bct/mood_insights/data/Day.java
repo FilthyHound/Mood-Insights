@@ -17,6 +17,10 @@ public class Day implements Serializable {
         instance = LocalDate.now();
     }
 
+    public Day(int dayOfMonth, Month month, int year){
+        instance = LocalDate.of(year, month, dayOfMonth);
+    }
+
     public String getDate(){
         return getDayOfMonth() + "-" + getMonth() + "-" + getYear();
     }

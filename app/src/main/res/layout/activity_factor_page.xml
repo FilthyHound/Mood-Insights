@@ -1,230 +1,238 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fillViewport="true"> <!--IMPORTANT otherwise background img. will not fill the whole screen -->
+    android:layout_height="match_parent">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scrollViewFactorPage"
+        android:paddingTop="10dp"
+        android:paddingBottom="30dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:context=".FactorPage">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/navView"
+        android:fillViewport="true"> <!--IMPORTANT otherwise background img. will not fill the whole screen -->
 
-        <TextView
-            android:id="@+id/welcome"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:text="@string/factor_page_welcome"
-            android:textSize="20sp"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            />
-
-        <TextView
-            android:id="@+id/dayTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/factor_page_day"
-            android:textStyle="bold"
-            android:textSize="20sp"
-            android:layout_marginTop="20dp"
-            app:layout_constraintTop_toBottomOf="@id/welcome"
-            app:layout_constraintLeft_toLeftOf="@+id/welcome"
-            />
-
-        <TextView
-            android:id="@+id/day"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="20sp"
-            android:layout_marginStart="60dp"
-            app:layout_constraintTop_toTopOf="@id/dayTitle"
-            app:layout_constraintLeft_toLeftOf="@id/dayTitle"
-            />
-
-        <TextView
-            android:id="@+id/sleepFactorHeader"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:text="@string/sleep_factor_group_title"
-            android:layout_marginStart="60dp"
-            app:layout_constraintTop_toBottomOf="@id/day"
-            app:layout_constraintLeft_toLeftOf="@id/welcome"
-            />
-
-        <TextView
-            android:id="@+id/SleepRatingTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/sleep_factor_rating_title"
-            android:textSize="20sp"
-            android:layout_marginTop="10dp"
-            app:layout_constraintLeft_toLeftOf="@id/sleepFactorHeader"
-            app:layout_constraintTop_toBottomOf="@id/sleepFactorHeader" />
-
-        <EditText
-            android:id="@+id/sleepRating"
-            android:layout_width="140dp"
-            android:layout_height="48dp"
-            android:hint="@string/sleep_factor_rating_hint"
-            android:importantForAutofill="no"
-            android:inputType="number"
-            android:textSize="20sp"
-            app:layout_constraintLeft_toRightOf="@id/SleepRatingTitle"
-            app:layout_constraintTop_toBottomOf="@id/sleepFactorHeader"
-            tools:targetApi="o"
-            />
-
-        <TextView
-            android:id="@+id/SleepAmountTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="20sp"
-            android:layout_marginTop="10dp"
-            android:text="@string/sleep_factor_amount_title"
-            app:layout_constraintTop_toBottomOf="@id/sleepRating"
-            app:layout_constraintLeft_toLeftOf="@id/sleepFactorHeader"
-            app:layout_constraintBottom_toBottomOf="@id/sleepAmount"
-            />
-
-        <EditText
-            android:id="@+id/sleepAmount"
-            android:layout_width="140dp"
-            android:layout_height="48dp"
-            android:layout_marginTop="10dp"
-            android:hint="@string/sleep_factor_amount_hint"
-            android:importantForAutofill="no"
-            android:inputType="number"
-            android:textSize="20sp"
-            app:layout_constraintLeft_toRightOf="@id/SleepAmountTitle"
-            app:layout_constraintTop_toBottomOf="@id/SleepRatingTitle" />
-
-        <TextView
-            android:id="@+id/sleepStartTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/sleep_factor_start_title"
-            android:textSize="20sp"
-            android:layout_marginTop="10dp"
-            app:layout_constraintLeft_toLeftOf="@id/sleepFactorHeader"
-            app:layout_constraintTop_toBottomOf="@+id/SleepAmountTitle"
-            />
-
-        <EditText
-            android:id="@+id/sleepStart"
-            android:layout_width="140dp"
-            android:layout_height="48dp"
-            android:layout_marginTop="10dp"
-            android:hint="@string/sleep_factor_start_hint"
-            android:importantForAutofill="no"
-            android:textSize="20sp"
-            android:inputType="time"
-            app:layout_constraintLeft_toRightOf="@id/sleepStartTitle"
-            app:layout_constraintTop_toBottomOf="@id/sleepAmount"
-            />
-        <TextView
-            android:id="@+id/sleepEndTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/sleep_factor_end_title"
-            android:textSize="20sp"
-            android:layout_marginTop="10dp"
-            app:layout_constraintTop_toBottomOf="@id/sleepStartTitle"
-            app:layout_constraintLeft_toLeftOf="@id/sleepFactorHeader"
-            app:layout_constraintBottom_toBottomOf="@id/sleepEnd"
-            />
-
-
-        <EditText
-            android:id="@+id/sleepEnd"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="48dp"
-            android:hint="@string/sleep_factor_end_hint"
-            android:importantForAutofill="no"
-            android:textSize="20sp"
-            android:inputType="time"
-            app:layout_constraintLeft_toRightOf="@id/sleepEndTitle"
-            app:layout_constraintTop_toBottomOf="@id/sleepStart"
-            />
-
-        <TextView
-            android:id="@+id/sleepDescStart"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/sleep_factors_title"
-            android:textSize="20sp"
-            app:layout_constraintTop_toBottomOf="@+id/sleepEndTitle"
-            app:layout_constraintLeft_toLeftOf="@id/sleepEndTitle"
-            tools:ignore="NotSibling" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/sleepFactorRecyclerView"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="140dp"
-            android:layout_marginEnd="40dp"
-            app:layout_constraintLeft_toRightOf="@id/sleepDescStart"
-            app:layout_constraintRight_toRightOf="@id/sleepEnd"
-            app:layout_constraintTop_toBottomOf="@+id/sleepEnd"
-            tools:ignore="NotSibling" />
+            android:layout_height="match_parent"
+            tools:context=".FactorPage">
+
+            <TextView
+                android:id="@+id/welcome"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="@string/factor_page_welcome"
+                android:textSize="20sp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                />
+
+            <TextView
+                android:id="@+id/dayTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/factor_page_day"
+                android:textStyle="bold"
+                android:textSize="20sp"
+                android:layout_marginTop="20dp"
+                app:layout_constraintTop_toBottomOf="@id/welcome"
+                app:layout_constraintLeft_toLeftOf="@+id/welcome"
+                />
+
+            <TextView
+                android:id="@+id/day"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:layout_marginStart="60dp"
+                app:layout_constraintTop_toTopOf="@id/dayTitle"
+                app:layout_constraintLeft_toLeftOf="@id/dayTitle"
+                />
+
+            <TextView
+                android:id="@+id/sleepFactorHeader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:text="@string/sleep_factor_group_title"
+                android:layout_marginStart="60dp"
+                app:layout_constraintTop_toBottomOf="@id/day"
+                app:layout_constraintLeft_toLeftOf="@id/welcome"
+                />
+
+            <TextView
+                android:id="@+id/SleepRatingTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/sleep_factor_rating_title"
+                android:textSize="20sp"
+                android:layout_marginTop="10dp"
+                app:layout_constraintLeft_toLeftOf="@id/sleepFactorHeader"
+                app:layout_constraintTop_toBottomOf="@id/sleepFactorHeader" />
+
+            <EditText
+                android:id="@+id/sleepRating"
+                android:layout_width="140dp"
+                android:layout_height="48dp"
+                android:hint="@string/sleep_factor_rating_hint"
+                android:importantForAutofill="no"
+                android:inputType="number"
+                android:textSize="20sp"
+                app:layout_constraintLeft_toRightOf="@id/SleepRatingTitle"
+                app:layout_constraintTop_toBottomOf="@id/sleepFactorHeader"
+                tools:targetApi="o"
+                />
+
+            <TextView
+                android:id="@+id/SleepAmountTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:layout_marginTop="10dp"
+                android:text="@string/sleep_factor_amount_title"
+                app:layout_constraintTop_toBottomOf="@id/sleepRating"
+                app:layout_constraintLeft_toLeftOf="@id/sleepFactorHeader"
+                app:layout_constraintBottom_toBottomOf="@id/sleepAmount"
+                />
+
+            <EditText
+                android:id="@+id/sleepAmount"
+                android:layout_width="140dp"
+                android:layout_height="48dp"
+                android:layout_marginTop="10dp"
+                android:hint="@string/sleep_factor_amount_hint"
+                android:importantForAutofill="no"
+                android:inputType="number"
+                android:textSize="20sp"
+                app:layout_constraintLeft_toRightOf="@id/SleepAmountTitle"
+                app:layout_constraintTop_toBottomOf="@id/SleepRatingTitle" />
+
+            <TextView
+                android:id="@+id/sleepStartTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/sleep_factor_start_title"
+                android:textSize="20sp"
+                android:layout_marginTop="10dp"
+                app:layout_constraintLeft_toLeftOf="@id/sleepFactorHeader"
+                app:layout_constraintTop_toBottomOf="@+id/SleepAmountTitle"
+                />
+
+            <EditText
+                android:id="@+id/sleepStart"
+                android:layout_width="140dp"
+                android:layout_height="48dp"
+                android:layout_marginTop="10dp"
+                android:hint="@string/sleep_factor_start_hint"
+                android:importantForAutofill="no"
+                android:textSize="20sp"
+                android:inputType="time"
+                app:layout_constraintLeft_toRightOf="@id/sleepStartTitle"
+                app:layout_constraintTop_toBottomOf="@id/sleepAmount"
+                />
+            <TextView
+                android:id="@+id/sleepEndTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/sleep_factor_end_title"
+                android:textSize="20sp"
+                android:layout_marginTop="10dp"
+                app:layout_constraintTop_toBottomOf="@id/sleepStartTitle"
+                app:layout_constraintLeft_toLeftOf="@id/sleepFactorHeader"
+                app:layout_constraintBottom_toBottomOf="@id/sleepEnd"
+                />
 
 
-        <Button
-            android:id="@+id/sleepFactorSubmit"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/button_update_sleep_factors"
-            android:layout_marginStart="28dp"
-            app:layout_constraintTop_toBottomOf="@id/sleepFactorRecyclerView"
-            app:layout_constraintLeft_toLeftOf="@id/sleepFactorHeader"
-            app:layout_constraintBottom_toTopOf="@id/signOut"
-            />
+            <EditText
+                android:id="@+id/sleepEnd"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="48dp"
+                android:hint="@string/sleep_factor_end_hint"
+                android:importantForAutofill="no"
+                android:textSize="20sp"
+                android:inputType="time"
+                app:layout_constraintLeft_toRightOf="@id/sleepEndTitle"
+                app:layout_constraintTop_toBottomOf="@id/sleepStart"
+                />
 
-        <Button
-            android:id="@+id/signOut"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:backgroundTint="@color/purple_700"
-            android:text="@string/button_logout"
-            android:textColor="@color/white"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/navView"/>
+            <TextView
+                android:id="@+id/sleepDescStart"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/sleep_factors_title"
+                android:textSize="20sp"
+                app:layout_constraintTop_toBottomOf="@+id/sleepEndTitle"
+                app:layout_constraintLeft_toLeftOf="@id/sleepEndTitle"
+                tools:ignore="NotSibling" />
 
-        <ProgressBar
-            android:id="@+id/progressBar"
-            style="?android:attr/progressBarStyleLarge"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            tools:ignore="MissingConstraints"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            />
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/sleepFactorRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="140dp"
+                android:layout_marginEnd="40dp"
+                app:layout_constraintLeft_toRightOf="@id/sleepDescStart"
+                app:layout_constraintRight_toRightOf="@id/sleepEnd"
+                app:layout_constraintTop_toBottomOf="@+id/sleepEnd"
+                tools:ignore="NotSibling" />
 
-        <com.google.android.material.bottomnavigation.BottomNavigationView
-            android:id="@+id/navView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            app:itemBackground="@color/purple_700"
-            app:itemIconTint="@drawable/selector"
-            app:itemTextColor="@drawable/selector"
-            app:menu="@menu/bottom_nav_menu"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</ScrollView>
+            <Button
+                android:id="@+id/sleepFactorSubmit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/button_update_sleep_factors"
+                android:layout_marginStart="28dp"
+                app:layout_constraintTop_toBottomOf="@id/sleepFactorRecyclerView"
+                app:layout_constraintLeft_toLeftOf="@id/sleepFactorHeader"
+                />
+
+            <Button
+                android:id="@+id/signOut"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/purple_700"
+                android:text="@string/button_logout"
+                android:textColor="@color/white"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/sleepFactorSubmit"/>
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                style="?android:attr/progressBarStyleLarge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                tools:ignore="MissingConstraints"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/navView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        app:itemBackground="@color/purple_700"
+        app:itemIconTint="@drawable/selector"
+        app:itemTextColor="@drawable/selector"
+        app:menu="@menu/bottom_nav_menu"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        />
+</androidx.constraintlayout.widget.ConstraintLayout>

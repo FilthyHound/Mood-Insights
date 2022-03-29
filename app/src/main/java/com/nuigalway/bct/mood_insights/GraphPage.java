@@ -45,7 +45,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -80,10 +79,10 @@ public class GraphPage extends AppCompatActivity implements AdapterView.OnItemSe
 
         sleepQualityAverageTextView = findViewById(R.id.sleepQualityAverage);
         hoursAsleepTextView = findViewById(R.id.hoursSleptAverage);
-        sleepFactorsTextView = findViewById(R.id.sleepFactprSelectionCount);
+        sleepFactorsTextView = findViewById(R.id.sleepFactorSelectionCount);
 
-        bottomNavSetup();
         userSetup();
+        bottomNavSetup();
     }
 
     private void spinnerSetup(){
@@ -138,6 +137,7 @@ public class GraphPage extends AppCompatActivity implements AdapterView.OnItemSe
         }catch (IOException e){
             e.printStackTrace();
         }
+
         userProfile = (User) getIntent().getSerializableExtra(Utils.USER_KEY);
 
         if(userProfile == null) {
@@ -208,7 +208,6 @@ public class GraphPage extends AppCompatActivity implements AdapterView.OnItemSe
                 setAverages();
                 break;
         }
-        //tv.setText(graphs.get(position));
     }
 
     @Override
@@ -317,12 +316,9 @@ public class GraphPage extends AppCompatActivity implements AdapterView.OnItemSe
         }
         processSleepValues(divisor);
         StringBuilder sb = new StringBuilder();
-        Map.Entry<String,Integer> entry;
         String temp;
-        Iterator<Map.Entry<String,Integer>> iterator = sortedFactors.entrySet().iterator();
-        while(iterator.hasNext()) {
-            entry = sortedFactors.entrySet().iterator().next();
-            temp = entry.getKey() + ": " + entry.getValue() + "; ";
+        for (Map.Entry<String, Integer> factorEntry : sortedFactors.entrySet()) {
+            temp = factorEntry.getKey() + ": " + factorEntry.getValue() + ";\n";
             sb.append(temp);
         }
         temp = "Average Sleep Quality: " + averageQualityOfSleep + ": ";

@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         String password = editTextPassword.getText().toString().trim();
 
         if (!v.isEmailValid(email, editTextEmail)
-                || !v.isPasswordValid(password, editTextPassword)) {
+                || v.isPasswordInvalid(password, editTextPassword)) {
             return;
         }
 

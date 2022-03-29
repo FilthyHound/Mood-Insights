@@ -9,6 +9,7 @@ import java.util.Properties;
 
 public class Utils {
     public static final String USER_KEY = "user";
+    public static final String OLD_DATE_FROM_CALENDAR = "old_date_from_calendar";
 
     public static String getProperty(String key, Context context) throws IOException {
         Properties properties = new Properties();

@@ -39,7 +39,6 @@ import com.nuigalway.bct.mood_insights.util.Utils;
 import com.nuigalway.bct.mood_insights.validation.Validator;
 
 import java.io.IOException;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Objects;
@@ -49,14 +48,13 @@ public class FactorPage extends AppCompatActivity {
     private boolean loadFactors = true;
     private FirebaseUser user;
     private DatabaseReference reference;
-
     private User userProfile;
+    private Boolean isNotTodaysDate;
 
     private ProgressBar progressBar;
 
     // Sleep Factor Variables
     private Validator validator;
-    private DatabaseManager db;
     private final ArrayList<Factor> factorsList = new ArrayList<>();
     private final ArrayList<TextView> factorViewListEnabled = new ArrayList<>();
     private final ArrayList<TextView> factorViewListDisabled = new ArrayList<>();
@@ -77,31 +75,12 @@ public class FactorPage extends AppCompatActivity {
         validator = new Validator();
         loadFactors = true;
 
-        initBottomNav();
+        setupUI();
         loadUserDetails();
+        initBottomNav();
     }
 
-    private void initBottomNav(){
-        BottomNavigationView bottomNavigationView = findViewById(R.id.navView);
-        bottomNavigationView.setSelectedItemId(R.id.factorHome);
-        bottomNavigationView.setOnItemSelectedListener(item -> {
-            if(item.getItemId() == R.id.calendar){
-                Intent calendar = new Intent(getApplicationContext(), CalendarPage.class);
-                calendar.putExtra(Utils.USER_KEY, userProfile);
-                startActivity(calendar);
-                overridePendingTransition(0, 0);
-                return true;
-            }else if(item.getItemId() == R.id.graph){
-                Intent graph = new Intent(getApplicationContext(), GraphPage.class);
-                graph.putExtra(Utils.USER_KEY, userProfile);
-                startActivity(graph);
-                overridePendingTransition(0, 0);
-                return true;
-            }else return item.getItemId() == R.id.factorHome;
-        });
-    }
-
-    private void loadUserDetails(){
+    private void setupUI() {
         progressBar = findViewById(R.id.progressBar);
 
         Button logOut = findViewById(R.id.signOut);
@@ -114,12 +93,93 @@ public class FactorPage extends AppCompatActivity {
         updateSleepFactorsButton.setOnClickListener(v -> handleUpdateSleepFactors());
 
         recyclerView = findViewById(R.id.sleepFactorRecyclerView);
+    }
 
+    private void handleUpdateSleepFactors() {
+        progressBar.setVisibility(View.VISIBLE);
+
+        Sleep currentSleep = userProfile.getDailySleepFactors().get(userProfile.getCurrentDay().getDate());
+        if(currentSleep == null){
+            currentSleep = new Sleep();
+        }
+
+        int rating = -1, amount = -1;
+        try {
+            rating = Integer.parseInt(sleepRating.getText().toString().trim());
+            amount = Integer.parseInt(sleepAmount.getText().toString().trim());
+        }catch(NumberFormatException e){
+            e.printStackTrace();
+        }
+
+        if(!validator.numberOneToTen(rating, sleepRating) || !validator.isNumberOneToTwentyThree(amount, sleepAmount)){
+            return;
+        }
+
+        currentSleep.setSleepQualityRating(rating);
+        currentSleep.setNumberOfHoursSlept(amount);
+        currentSleep.setTimeInBed(sleepStart.getText().toString().trim());
+        currentSleep.setTimeLeftBed(sleepEnd.getText().toString().trim());
+
+        for(View v : factorViewListEnabled){
+            String factor = ((TextView) v).getText().toString();
+            if(currentSleep.containsSleepFactor(factor)){
+                currentSleep.updateSleepFactor(factor, true);
+            }else{
+                currentSleep.addSleepFactor(factor);
+            }
+        }
+
+        for(View v : factorViewListDisabled){
+            String factor = ((TextView) v).getText().toString();
+            currentSleep.updateSleepFactor(factor, false);
+        }
+
+        if(!userProfile.getDates().contains(userProfile.getCurrentDay().getDate())) {
+            userProfile.getDates().add(userProfile.getCurrentDay().getDate());
+        }
+
+        String dateKey = userProfile.getDate();
+        userProfile.getDailySleepFactors().put(dateKey, currentSleep);
+
+        if(isNotTodaysDate){
+            userProfile.setCurrentDay(new Day());
+            isNotTodaysDate = false;
+        }
+
+        try {
+            FirebaseDatabase.getInstance(Utils.getProperty("app.database", getApplicationContext())).getReference("Users")
+                    .child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid())
+                    .setValue(userProfile).addOnCompleteListener(taskDatabaseCommunications -> {
+                if (taskDatabaseCommunications.isSuccessful()) {
+                    Toast.makeText(FactorPage.this, "User has been successfully updated!", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(FactorPage.this, "Failed to update, try again!", Toast.LENGTH_LONG).show();
+                }
+                progressBar.setVisibility(View.GONE);
+            });
+        }catch(IOException e){
+            e.printStackTrace();
+            //TODO make these logs
+            Toast.makeText(FactorPage.this, "Error, couldn't connect to database", Toast.LENGTH_LONG).show();
+        }catch(NullPointerException e){
+            e.printStackTrace();
+            //TODO make these logs
+            Toast.makeText(FactorPage.this, "Error, couldn't get account", Toast.LENGTH_LONG).show();
+        }finally {
+            progressBar.setVisibility(View.GONE);
+        }
+    }
+
+    private void loadUserDetails(){
         try {
             user = FirebaseAuth.getInstance().getCurrentUser();
             reference = FirebaseDatabase.getInstance(Utils.getProperty("app.database", getApplicationContext())).getReference("Users");
+            isNotTodaysDate = getIntent().getExtras().getBoolean(Utils.OLD_DATE_FROM_CALENDAR);
         }catch (IOException e){
             e.printStackTrace();
+        }catch (NullPointerException npe){
+            npe.printStackTrace();
+            isNotTodaysDate = false;
         }
 
         // Try to get the user profile if coming from the graph or calendar page
@@ -149,6 +209,36 @@ public class FactorPage extends AppCompatActivity {
                 Toast.makeText(FactorPage.this, "Signing Out", Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+    private void populateUserData(){
+        final TextView welcomeTextView = findViewById(R.id.welcome);
+        final TextView dayTextView = findViewById(R.id.day);
+
+        String fullName = userProfile.fullName;
+        Day d = userProfile.getCurrentDay();
+        Day toCheck = new Day();
+
+        if(!d.equals(toCheck) && !isNotTodaysDate){
+            if(!userProfile.getDates().contains(d.getDate())){
+                userProfile.getDates().add(d.getDate());
+            }
+            userProfile.setCurrentDay(new Day());
+            String date = userProfile.getCurrentDay().getDate();
+            userProfile.getDailySleepFactors().put(date, new Sleep());
+            userProfile.getDates().add(date);
+        }
+
+        String welcomeText = "Welcome, " + fullName + "!";
+        welcomeTextView.setText(welcomeText);
+        dayTextView.setText(userProfile.getDate());
+
+        initDialogs();
+        if(loadFactors) {
+            setFactorInfo();
+            setAdaptor();
+            loadFactors = false;
+        }
     }
 
     private void initDialogs(){
@@ -222,106 +312,6 @@ public class FactorPage extends AppCompatActivity {
         }
     }
 
-    private void handleUpdateSleepFactors() {
-        progressBar.setVisibility(View.VISIBLE);
-
-        Sleep currentSleep = userProfile.getDailySleepFactors().get(userProfile.getCurrentDay().getDate());
-        if(currentSleep == null){
-            currentSleep = new Sleep();
-        }
-
-        int rating = -1, amount = -1;
-        try {
-            rating = Integer.parseInt(sleepRating.getText().toString().trim());
-            amount = Integer.parseInt(sleepAmount.getText().toString().trim());
-        }catch(NumberFormatException e){
-            e.printStackTrace();
-        }
-
-        if(!validator.numberOneToTen(rating, sleepRating) || !validator.isNumberOneToTwentyThree(amount, sleepAmount)){
-            return;
-        }
-
-        currentSleep.setSleepQualityRating(rating);
-        currentSleep.setNumberOfHoursSlept(amount);
-        currentSleep.setTimeInBed(sleepStart.getText().toString().trim());
-        currentSleep.setTimeLeftBed(sleepEnd.getText().toString().trim());
-
-        for(View v : factorViewListEnabled){
-            String factor = ((TextView) v).getText().toString();
-            if(currentSleep.containsSleepFactor(factor)){
-                currentSleep.updateSleepFactor(factor, true);
-            }else{
-                currentSleep.addSleepFactor(factor);
-            }
-        }
-
-        for(View v : factorViewListDisabled){
-            String factor = ((TextView) v).getText().toString();
-            currentSleep.updateSleepFactor(factor, false);
-        }
-
-        if(!userProfile.getDates().contains(userProfile.getCurrentDay().getDate())) {
-            userProfile.getDates().add(userProfile.getCurrentDay().getDate());
-        }
-
-        String dateKey = userProfile.getDate();
-        userProfile.getDailySleepFactors().put(dateKey, currentSleep);
-
-        try {
-            FirebaseDatabase.getInstance(Utils.getProperty("app.database", getApplicationContext())).getReference("Users")
-                    .child(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid())
-                    .setValue(userProfile).addOnCompleteListener(taskDatabaseCommunications -> {
-                if (taskDatabaseCommunications.isSuccessful()) {
-                    Toast.makeText(FactorPage.this, "User has been successfully updated!", Toast.LENGTH_LONG).show();
-                } else {
-                    Toast.makeText(FactorPage.this, "Failed to update, try again!", Toast.LENGTH_LONG).show();
-                }
-                progressBar.setVisibility(View.GONE);
-            });
-        }catch(IOException e){
-            e.printStackTrace();
-            //TODO make these logs
-            Toast.makeText(FactorPage.this, "Error, couldn't connect to database", Toast.LENGTH_LONG).show();
-        }catch(NullPointerException e){
-            e.printStackTrace();
-            //TODO make these logs
-            Toast.makeText(FactorPage.this, "Error, couldn't get account", Toast.LENGTH_LONG).show();
-        }finally {
-            progressBar.setVisibility(View.GONE);
-        }
-    }
-
-    private void populateUserData(){
-        final TextView welcomeTextView = findViewById(R.id.welcome);
-        final TextView dayTextView = findViewById(R.id.day);
-
-        String fullName = userProfile.fullName;
-        Day d = userProfile.getCurrentDay();
-        Day toCheck = new Day();
-
-        if(!d.equals(toCheck)){
-            if(!userProfile.getDates().contains(d.getDate())){
-                userProfile.getDates().add(d.getDate());
-            }
-            userProfile.setCurrentDay(new Day());
-            String date = userProfile.getCurrentDay().getDate();
-            userProfile.getDailySleepFactors().put(date, new Sleep());
-            userProfile.getDates().add(date);
-        }
-
-        String welcomeText = "Welcome, " + fullName + "!";
-        welcomeTextView.setText(welcomeText);
-        dayTextView.setText(userProfile.getDate());
-
-        initDialogs();
-        if(loadFactors) {
-            setFactorInfo();
-            setAdaptor();
-            loadFactors = false;
-        }
-    }
-
     private void setFactorInfo(){
         String[] sleepFactors = getResources().getStringArray(R.array.sleep_factors);
         for(String s : sleepFactors){
@@ -340,6 +330,27 @@ public class FactorPage extends AppCompatActivity {
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(adaptor);
     }
+
+    private void initBottomNav(){
+        BottomNavigationView bottomNavigationView = findViewById(R.id.navView);
+        bottomNavigationView.setSelectedItemId(R.id.factorHome);
+        bottomNavigationView.setOnItemSelectedListener(item -> {
+            if(item.getItemId() == R.id.calendar){
+                Intent calendar = new Intent(getApplicationContext(), CalendarPage.class);
+                calendar.putExtra(Utils.USER_KEY, userProfile);
+                startActivity(calendar);
+                overridePendingTransition(0, 0);
+                return true;
+            }else if(item.getItemId() == R.id.graph){
+                Intent graph = new Intent(getApplicationContext(), GraphPage.class);
+                graph.putExtra(Utils.USER_KEY, userProfile);
+                startActivity(graph);
+                overridePendingTransition(0, 0);
+                return true;
+            }else return item.getItemId() == R.id.factorHome;
+        });
+    }
+
 
     /**
      * Method sets the functionality for when an element in the factor list is clicked

@@ -17,6 +17,8 @@ import java.util.List;
 public class DateKeyParser {
     private static final String HYPHEN = "-";
     private final User user;
+    private int currentDayOfMonth, currentYear;
+    private Month currentMonth;
     private LocalDate currDate;
 
     public DateKeyParser(User user){
@@ -24,13 +26,17 @@ public class DateKeyParser {
         parseCurrentDate();
     }
 
-    public void parseCurrentDate(){
+    private void parseCurrentDate(){
         String date = user.getDate();
         String[] dateArray = date.split(HYPHEN);
-        int dayOfMonth = Integer.parseInt(dateArray[0]);
-        Month month = Month.valueOf(dateArray[1]);
-        int year = Integer.parseInt(dateArray[2]);
-        currDate = LocalDate.of(year, month, dayOfMonth);
+        currentDayOfMonth = Integer.parseInt(dateArray[0]);
+        currentMonth = Month.valueOf(dateArray[1]);
+        currentYear = Integer.parseInt(dateArray[2]);
+        currDate = LocalDate.of(currentYear, currentMonth, currentDayOfMonth);
+    }
+
+    public boolean parseCalendarDate(int dayOfMonth, Month month, int year){
+        return year <= currentYear && month.getValue() <= currentMonth.getValue() && dayOfMonth < currentDayOfMonth;
     }
 
     public List<String> lastSevenDays(){

@@ -1,4 +1,4 @@
-package com.nuigalway.bct.mood_insights.util;;
+package com.nuigalway.bct.mood_insights.util;
 
 public class DatabaseManager {
     private static DatabaseManager instance;
@@ -7,11 +7,10 @@ public class DatabaseManager {
 
     }
 
-    public DatabaseManager getDatabaseManager(){
+    public static DatabaseManager getInstance(){
         if(instance == null){
             instance = new DatabaseManager();
         }
         return instance;
     }
-
 }

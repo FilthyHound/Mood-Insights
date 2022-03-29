@@ -1,16 +1,13 @@
 package com.nuigalway.bct.mood_insights.data;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
+import java.io.Serializable;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-public class Sleep {
-    private int numberOfHoursSlept;
-    private int sleepQualityRating;
-    private String timeInBed, timeLeftBed;
+public class Sleep implements Serializable {
+    private int numberOfHoursSlept = 0;
+    private int sleepQualityRating = 0;
+    private String timeInBed = "", timeLeftBed = "";
     private final Map<String, Boolean> sleepFactors;
 
     public Sleep(){

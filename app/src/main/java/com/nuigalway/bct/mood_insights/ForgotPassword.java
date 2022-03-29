@@ -36,17 +36,10 @@ public class ForgotPassword extends AppCompatActivity {
     }
 
     private void resetPassword(){
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         Validator validator = new Validator();
         String email = emailEditText.getText().toString().trim();
 
-        if(user == null || !validator.isEmailValid(email, emailEditText)){
-            return;
-        }
-
-        if(!user.isEmailVerified()){
-            emailEditText.setError("Email not verified! Please verify your email!");
-            emailEditText.requestFocus();
+        if(!validator.isEmailValid(email, emailEditText)){
             return;
         }
 

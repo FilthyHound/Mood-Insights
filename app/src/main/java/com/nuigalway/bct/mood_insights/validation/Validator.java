@@ -7,6 +7,9 @@ import org.apache.commons.validator.routines.EmailValidator;
 
 import java.util.regex.Pattern;
 
+/**
+ * Validator class validates user input received from EditText classes
+ */
 public class Validator {
     //TODO on release, update minimum password length to 8
     private static final int MINIMUM_PASSWORD_LENGTH = 6;
@@ -25,20 +28,22 @@ public class Validator {
         return true;
     }
 
-    public boolean isPasswordValid(String password, EditText passwordEditText){
+    public boolean isPasswordInvalid(String password, EditText passwordEditText) {
         if(password.isEmpty()){
             passwordEditText.setError("Password is required!");
             passwordEditText.requestFocus();
-            return false;
+            return true;
         }else if(password.length() < MINIMUM_PASSWORD_LENGTH){
             passwordEditText.setError("Password length must be greater or equal to" + MINIMUM_PASSWORD_LENGTH + " characters!");
             passwordEditText.requestFocus();
-            return false;
-        }else{
             return true;
+        }if(!PASSWORD_PATTERN.matcher(password).matches()){
+            passwordEditText.setError("Password must have one capital letter, one number and one special character");
+            passwordEditText.requestFocus();
+            return true;
+        }else{
+            return false;
         }
-
-        //TODO on release, enforce maximum chars of 100, at least one capital letter, one number and one special char
     }
 
     public boolean genericStringValidation(String s, EditText eT){

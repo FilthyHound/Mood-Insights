@@ -45,7 +45,7 @@ public class FactorRecyclerAdaptor extends RecyclerView.Adapter<FactorRecyclerAd
     public void onBindViewHolder(@NonNull FactorRecyclerAdaptor.MyViewHolder holder, int position) {
         String factor = factorsList.get(position).getFactorName();
         holder.factorNameText.setText(factor);
-        if(currentSleepFactors.getSleepFactorValue(factor)){
+        if(currentSleepFactors != null && currentSleepFactors.getSleepFactorValue(factor)){
             holder.getView().setBackgroundColor(holder.getParent().getContext().getResources().getColor(R.color.factorSelected));
             fp.addTextViewFactorToFactorViewListEnabled(holder.factorNameText);
         }else{

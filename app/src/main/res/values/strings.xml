@@ -31,7 +31,7 @@
     <!-- Factor Page -->
     <string name="sleep_factor_group_title">Sleep Factors</string>
     <string name="sleep_factor_rating_title">Sleep Rating:</string>
-    <string name="sleep_factor_rating_hint">from 1 - 10</string>
+    <string name="sleep_factor_rating_hint">from 1 – 10</string>
     <string name="sleep_factor_amount_title">Time Asleep:</string>
     <string name="sleep_factor_amount_hint">In Hours</string>
     <string name="sleep_factor_start_title">Went to sleep at:</string>
@@ -57,6 +57,11 @@
     <string name="last_7_days">Last 7 Days</string>
     <string name="last_30_days">Last 30 Days</string>
     <string name="last_year">Last Year</string>
+
+    <!-- Bottom Navigation Bar Strings -->
+    <string name="bottom_nav_title_calendar">Calendar</string>
+    <string name="bottom_nav_title_factors">Factors</string>
+    <string name="bottom_nav_title_graph">Graph</string>
 
     <string-array name="graph_types">
         <item>@string/last_7_days</item>

@@ -3,19 +3,19 @@
 
     <item
         android:id="@+id/calendar"
-        android:title="Calendar"
+        android:title="@string/bottom_nav_title_calendar"
         android:icon="@drawable/ic_calendar"
         />
 
     <item
         android:id="@+id/factorHome"
-        android:title="Factors"
+        android:title="@string/bottom_nav_title_factors"
         android:icon="@drawable/ic_home"
         />
 
     <item
         android:id="@+id/graph"
-        android:title="Graph"
+        android:title="@string/bottom_nav_title_graph"
         android:icon="@drawable/ic_graph"
         />
 </menu>

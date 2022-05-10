@@ -3,19 +3,31 @@ package com.nuigalway.bct.mood_insights;
 
 import static androidx.test.core.app.ApplicationProvider.getApplicationContext;
 import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.Espresso.pressBack;
 import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.action.ViewActions.scrollTo;
+import static androidx.test.espresso.action.ViewActions.swipeDown;
 import static androidx.test.espresso.action.ViewActions.typeText;
+import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withHint;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 
 import static org.hamcrest.Matchers.allOf;
 
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewParent;
+
+import androidx.test.espresso.ViewInteraction;
 import androidx.test.rule.ActivityTestRule;
 
 
 import com.nuigalway.bct.mood_insights.util.Utils;
 
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
+import org.hamcrest.TypeSafeMatcher;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -46,9 +58,8 @@ public class MainActivityUITest {
         onView(withId(R.id.signIn)).perform(click());
         Thread.sleep(2000L);
         // Check if next page has loaded
-        onView((withId(R.id.welcome)));
-        onView(withId(R.id.signOut)).perform(click());
-        // Verify if back to login page page is back
+        onView(withId(R.id.welcome));
+        pressBack();
         checkViewsOfMainActivity();
     }
 
